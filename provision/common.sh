@@ -26,4 +26,4 @@ apt-mark hold kubelet kubeadm kubectl
 
 kubectl completion bash | tee /etc/bash_completion.d/kubectl > /dev/null
 
-echo "192.168.56.2 k8scp" | tee --append /etc/hosts
+echo "10.0.0.10 k8scp" | tee --append /etc/hosts

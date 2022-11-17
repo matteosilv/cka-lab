@@ -2,7 +2,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "cp" do |control|
     control.vm.box = "ubuntu/focal64"
     control.vm.hostname = "cp"
-    control.vm.network :private_network, ip: "192.168.56.2"
+    control.vm.network :private_network, ip: "10.0.0.10"
 
     config.vm.provider "virtualbox" do |vb|
       vb.memory = "2048"
@@ -20,7 +20,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "worker" do |worker|
     worker.vm.box = "ubuntu/focal64"
     worker.vm.hostname = "worker"
-    worker.vm.network :private_network, ip: "192.168.56.3"
+    worker.vm.network :private_network, ip: "10.0.0.11"
 
     worker.vm.provider "virtualbox" do |vb|
       vb.memory = "2048"
