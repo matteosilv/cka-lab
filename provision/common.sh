@@ -2,14 +2,10 @@
 
 set -e
 
-# add kubernetes apt gpg key
-curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
-echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list
-
 apt-get update
 apt-get upgrade -y
 apt-get install -y curl apt-transport-https vim git wget gnupg2 \
-    software-properties-common apt-transport-https ca-certificates uidmap bash-completion
+    software-properties-common lsb-release ca-certificates uidmap bash-completion
 
 swapoff -a
 modprobe overlay
@@ -21,9 +17,28 @@ net.ipv4.ip_forward = 1
 EOF
 sysctl --system
 
-apt-get install -y containerd kubeadm=1.24.1-00 kubelet=1.24.1-00 kubectl=1.24.1-00
+mkdir -m 0755 -p /etc/apt/keyrings
+
+# add kubernetes apt gpg key
+curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list
+
+# add docker apt gpg key
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+apt-get update
+apt-get install -y containerd.io kubeadm=1.25.1-00 kubelet=1.25.1-00 kubectl=1.25.1-00
 apt-mark hold kubelet kubeadm kubectl
+
+containerd config default | tee /etc/containerd/config.toml
+sed -e 's/SystemdCgroup = false/SystemdCgroup = true/g' -i /etc/containerd/config.toml
+systemctl restart containerd
 
 kubectl completion bash | tee /etc/bash_completion.d/kubectl > /dev/null
 
 echo "10.0.0.10 k8scp" | tee --append /etc/hosts
+
+crictl config --set runtime-endpoint=unix:///run/containerd/containerd.sock --set image-endpoint=unix:///run/containerd/containerd.sock
