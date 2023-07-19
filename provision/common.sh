@@ -30,7 +30,7 @@ echo \
   $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
 
 apt-get update
-apt-get install -y containerd.io kubeadm=1.25.1-00 kubelet=1.25.1-00 kubectl=1.25.1-00
+apt-get install -y containerd.io kubeadm=1.27.1-00 kubelet=1.27.1-00 kubectl=1.27.1-00
 apt-mark hold kubelet kubeadm kubectl
 
 containerd config default | tee /etc/containerd/config.toml
