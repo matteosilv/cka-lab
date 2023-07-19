@@ -39,6 +39,6 @@ systemctl restart containerd
 
 kubectl completion bash | tee /etc/bash_completion.d/kubectl > /dev/null
 
-echo "10.0.0.10 k8scp" | tee --append /etc/hosts
+echo "10.0.0.12 k8scp" | tee --append /etc/hosts
 
 crictl config --set runtime-endpoint=unix:///run/containerd/containerd.sock --set image-endpoint=unix:///run/containerd/containerd.sock
